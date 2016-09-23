@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+{% if current_data %}
+        <h3>Hardware data:</h3>
+<ul>     <h3>All values:</h3>
+    {% for data in current_data %}
+    <li>    CPU usage: {{ data.CPU_usage }} <br>
+            SWAP usage: {{ data.SWAP_usage }} <br>
+    </li>
+    {% endfor %}
+</ul>
+   <div id="container" style="width:50%; height:400px;"></div>
+{% else %}
+    <h3> No data! </h3>
+{% endif %}
+
+
+
+</body>
+</html>
