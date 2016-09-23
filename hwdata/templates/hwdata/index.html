@@ -1,311 +1,179 @@
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
-<script src="http://code.highcharts.com/highcharts.js"></script>
-<script src="http://code.highcharts.com/highcharts-more.js"></script>
-<script src="http://code.highcharts.com/modules/exporting.js"></script>
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Highcharts Example</title>
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 
 
-
-
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<title>Highcharts Example</title>
-
-		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-
-
-<!-- <script src="refresh_data.js"></script> -->
-<script>
-    $(function () {
-    var chart = new Highcharts.Chart({
-
-        chart: {
-            renderTo: 'container',
-            type: 'gauge',
-            plotBorderWidth: 1,
-            plotBackgroundColor: {
-                linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
-                stops: [
-                    [0, '#FFF4C6'],
-                    [0.3, '#FFFFFF'],
-                    [1, '#FFF4C6']
-                ]
-            },
-            plotBackgroundImage: null,
-            height: 200
-        },
-
-        title: {
-            text: 'Computer current parameters'
-        },
-
-        pane: [{
-            startAngle: -45,
-            endAngle: 45,
-            background: null,
-            center: ['25%', '145%'],
-            size: 300
-        }, {
-            startAngle: -45,
-            endAngle: 45,
-            background: null,
-            center: ['75%', '145%'],
-            size: 300
-        }],
-
-        yAxis: [{
-            min: 0,
-            max: 100,
-            minorTickPosition: 'outside',
-            tickPosition: 'outside',
-            labels: {
-                rotation: 'auto',
-                distance: 20
-            },
-            plotBands: [{
-                from: 80,
-                to: 100,
-                color: '#C02316',
-                innerRadius: '100%',
-                outerRadius: '105%'
-            }],
-            pane: 0,
-            title: {
-                text: 'CPU usage<br/><span style="font-size:8px">[ % ]</span>',
-                y: -40
-            }
-        }, {
-            min: 0,
-            max: 100,
-            minorTickPosition: 'outside',
-            tickPosition: 'outside',
-            labels: {
-                rotation: 'auto',
-                distance: 20
-            },
-            plotBands: [{
-                from: 80,
-                to: 100,
-                color: '#C02316',
-                innerRadius: '100%',
-                outerRadius: '105%'
-            }],
-            pane: 1,
-            title: {
-                text: 'SWAP usage<br/><span style="font-size:8px">[ % ]</span>',
-                y: -40
-            }
-        }],
-
-        plotOptions: {
-            gauge: {
-                dataLabels: {
-                    enabled: false
-                },
-                dial: {
-                    radius: '100%'
-                }
-            }
-        },
-
-
-        series: [{
-            {% for data in current_data %}
-            data: [{{ data.CPU_usage }}],
-            {% endfor %}
-            yAxis: 0
-        }, {
-
-            {% for data in current_data %}
-            data: [{{ data.SWAP_usage }}],
-            {% endfor %}
-            yAxis: 1
-        }]
-
-    },
-
-
-    // Let the music play
-    function(chart) {
-        setInterval(function() {
-/*            var left = chart.series[0].points[0],
-                right = chart.series[1].points[0],
-                leftVal,
-                inc = (Math.random() - 0.5) * 3;
-            inc = 0;
-
-            leftVal =  left.y + inc;
-            rightVal = leftVal + inc / 3;
-            if (leftVal < -20 || leftVal > 6) {
-                leftVal = left.y - inc;
-            }
-            if (rightVal < -20 || rightVal > 6) {
-                rightVal = leftVal;
-            }
-
-            left.update(leftVal, false);
-            right.update(rightVal, false); */
-            chart.redraw();
-
-
-        }, 500);
-
-    });
-});
-</script>
-
-
-<script>
 
     <script type="text/javascript">
-$(function () {
+        setInterval("generateAjaxRequest()", 100);
 
-    var gaugeOptions = {
+        function generateAjaxRequest() {
 
-        chart: {
-            type: 'solidgauge'
-        },
+            $.ajax({
+                type: "GET",
+                url: "/hwdata/json/",
+                data: name,
+                cache: false,
+                dataType: "json",
+                success: function (data) {
 
-        title: null,
+                    var cpu = data['cpu usage'];
+                    var swap = data['swap usage'];
 
-        pane: {
-            center: ['50%', '85%'],
-            size: '140%',
-            startAngle: -90,
-            endAngle: 90,
-            background: {
-                backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || '#EEE',
-                innerRadius: '60%',
-                outerRadius: '100%',
-                shape: 'arc'
-            }
-        },
 
-        tooltip: {
-            enabled: false
-        },
+                    var chart = $('#container-speed').highcharts(),
+                            point,
+                            newVal,
+                            inc;
 
-        // the value axis
-        yAxis: {
-            stops: [
-                [0.1, '#55BF3B'], // green
-                [0.5, '#DDDF0D'], // yellow
-                [0.9, '#DF5353'] // red
-            ],
-            lineWidth: 0,
-            minorTickInterval: null,
-            tickAmount: 2,
-            title: {
-                y: -70
-            },
-            labels: {
-                y: 16
-            }
-        },
+                    // Update Cpu value
+                    if (chart) {
+                        point = chart.series[0].points[0];
+                        newVal = cpu;
+                        point.update(newVal);
+                    }
 
-        plotOptions: {
-            solidgauge: {
-                dataLabels: {
-                    y: 5,
-                    borderWidth: 0,
-                    useHTML: true
+                    // Update Swap value
+                    chart = $('#container-rpm').highcharts();
+                    if (chart) {
+                        point = chart.series[0].points[0];
+                        newVal = swap;
+
+                        newVal = swap;
+                        point.update(newVal);
+                    }
+
+
+                },
+                error: function (error) {
+                    console.log("Error:");
+                    console.log(error);
                 }
-            }
-        }
-    };
-
-    // The speed gauge
-    $('#container-speed').highcharts(Highcharts.merge(gaugeOptions, {
-        yAxis: {
-            min: 0,
-            max: 200,
-            title: {
-                text: 'Speed'
-            }
-        },
-
-        credits: {
-            enabled: false
-        },
-
-        series: [{
-            name: 'Speed',
-            data: [80],
-            dataLabels: {
-                format: '<div style="text-align:center"><span style="font-size:25px;color:' +
-                    ((Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black') + '">{y}</span><br/>' +
-                       '<span style="font-size:12px;color:silver">km/h</span></div>'
-            },
-            tooltip: {
-                valueSuffix: ' km/h'
-            }
-        }]
-
-    }));
-
-    // The RPM gauge
-    $('#container-rpm').highcharts(Highcharts.merge(gaugeOptions, {
-        yAxis: {
-            min: 0,
-            max: 5,
-            title: {
-                text: 'RPM'
-            }
-        },
-
-        series: [{
-            name: 'RPM',
-            data: [1],
-            dataLabels: {
-                format: '<div style="text-align:center"><span style="font-size:25px;color:' +
-                    ((Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black') + '">{y:.1f}</span><br/>' +
-                       '<span style="font-size:12px;color:silver">* 1000 / min</span></div>'
-            },
-            tooltip: {
-                valueSuffix: ' revolutions/min'
-            }
-        }]
-
-    }));
-
-    // Bring life to the dials
-    setTimeout(function () {
-        // Speed
-        var chart = $('#container-speed').highcharts(),
-            point,
-            newVal,
-            inc;
-
-        if (chart) {
-            point = chart.series[0].points[0];
-            inc = Math.round((Math.random() - 0.5) * 100);
-            newVal = point.y + inc;
-
-            if (newVal < 0 || newVal > 200) {
-                newVal = point.y - inc;
-            }
-
-            point.update(newVal);
+            });
+            // window.location = location.href;
         }
 
-        // RPM
-        chart = $('#container-rpm').highcharts();
-        if (chart) {
-            point = chart.series[0].points[0];
-            inc = Math.random() - 0.5;
-            newVal = point.y + inc;
 
-            if (newVal < 0 || newVal > 5) {
-                newVal = point.y - inc;
-            }
+        $(function () {
+            var gaugeOptions = {
 
-            point.update(newVal);
-        }
-    }, 2000);
+                chart: {
+                    type: 'solidgauge'
+                },
+
+                title: null,
+
+                pane: {
+                    center: ['50%', '85%'],
+                    size: '140%',
+                    startAngle: -90,
+                    endAngle: 90,
+                    background: {
+                        backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || '#EEE',
+                        innerRadius: '60%',
+                        outerRadius: '100%',
+                        shape: 'arc'
+                    }
+                },
+
+                tooltip: {
+                    enabled: false
+                },
+
+                // the value axis
+                yAxis: {
+                    stops: [
+                        [0.1, '#55BF3B'], // green
+                        [0.5, '#DDDF0D'], // yellow
+                        [0.9, '#DF5353'] // red
+                    ],
+                    lineWidth: 0,
+                    minorTickInterval: null,
+                    tickAmount: 2,
+                    title: {
+                        y: -70
+                    },
+                    labels: {
+                        y: 16
+                    }
+                },
+
+                plotOptions: {
+                    solidgauge: {
+                        dataLabels: {
+                            y: 5,
+                            borderWidth: 0,
+                            useHTML: true
+                        }
+                    }
+                }
+            };
+
+            // The speed gauge
+            $('#container-speed').highcharts(Highcharts.merge(gaugeOptions, {
+                yAxis: {
+                    min: 0,
+                    max: 100,
+                    title: {
+                        text: 'CPU'
+                    }
+                },
+
+                credits: {
+                    enabled: false
+                },
+
+                series: [{
+                    name: 'Cpu',
+                    data: [0],
+                    dataLabels: {
+                        format: '<div style="text-align:center"><span style="font-size:25px;color:' +
+                        ((Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black') + '">{y}</span><br/>' +
+                        '<span style="font-size:12px;color:silver">%</span></div>'
+                    },
+                    tooltip: {
+                        valueSuffix: ' km/h'
+                    }
+                }]
+
+            }));
+
+            // The RPM gauge
+            $('#container-rpm').highcharts(Highcharts.merge(gaugeOptions, {
+                yAxis: {
+                    min: 0,
+                    max: 100,
+                    title: {
+                        text: 'Swap'
+                    }
+                },
+
+                series: [{
+                    name: 'Swap',
+                    data: [0],
+                    dataLabels: {
+                        format: '<div style="text-align:center"><span style="font-size:25px;color:' +
+                        ((Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black') + '">{y:.1f}</span><br/>' +
+                        '<span style="font-size:12px;color:silver">%</span></div>'
+                    },
+                    tooltip: {
+                        valueSuffix: ' revolutions/min'
+                    }
+                }]
+
+            }));
 
 
-});
+        });
 
 
-</script>
+    </script>
+</head>
+<body>
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/highcharts-more.js"></script>
 
@@ -317,59 +185,5 @@ $(function () {
 </div>
 
 
-
-
-
-{% if current_data %}
-        <h3>Hardware data:</h3>
-<ul>     <h3>Current values:</h3>
-    {% for data in current_data %}
-    <li>    CPU usage: {{ data.CPU_usage }} <br>
-            SWAP usage: {{ data.SWAP_usage }} <br>
-    </li>
-    {% endfor %}
-</ul>
-   <div id="container" style="width:50%; height:400px;"></div>
-{% else %}
-    <h3> No data! </h3>
-{% endif %}
-
-<div id="results">dfgdsgf</div>
-<div id="div1">dfgdsgf</div>
-
-<script type="text/javascript">
-  setInterval("moja_funkcja();",3000);
-
-   $.ajax({
-            type: "GET",
-            url: "/hwdata/json/",
-       data: name,
-    cache:false,
-    dataType: "json",
-            success: function(data) {
-var cpu = data['cpu usage'];
-var swap  = data['swap usage'];
-
-
-                //let's display a few items
-                    for (var i=0;i<json.length;++i) {
-                        $("#div1").html(data);
-                     $('#results').append('<div class="name">'+json[i].name+'</>');
-                     }
-                //for(i = 0; i < data.length; i++){
-            //    $('ul').append('<li>'+data[i]+'</li>');
-            //}
-        },
-    error: function(error){
-         console.log("Error:");
-         console.log(error);
-    }
-        });
-
-  function moja_funkcja(){
-
-//chart.redraw();
-
-      //  window.location = location.href;
-    }
-</script>
+</body>
+</html>

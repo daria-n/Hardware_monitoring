@@ -9,7 +9,7 @@ from django.core import serializers
 def index(request):
     count = Data.objects.count()
     my_data = Data.objects.all()[count-1:]
-    return render(request, 'hwdata/index2.html', {'current_data': my_data})
+    return render(request, 'hwdata/index.html', {'current_data': my_data})
 
 
 def json(request):
