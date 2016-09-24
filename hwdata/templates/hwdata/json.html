@@ -1,26 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'hwdata/base.html' %}
+{% block title %}Json{% endblock %}
 
-{% if current_data %}
-        <h3>Hardware data:</h3>
-<ul>     <h3>All values:</h3>
-    {% for data in current_data %}
-    <li>    CPU usage: {{ data.CPU_usage }} <br>
-            SWAP usage: {{ data.SWAP_usage }} <br>
-    </li>
-    {% endfor %}
-</ul>
-   <div id="container" style="width:50%; height:400px;"></div>
-{% else %}
-    <h3> No data! </h3>
-{% endif %}
+{% block body %}
 
+    <div class="container-fluid">
+    {% if current_data %}
+        <h2>Hardware data:</h2>
+        <h3>Storing the latest {{ count }} records:</h3>
+        <table class="table table-condensed table-hover">
+            <thead>
+            <tr class="active">
+                <th>Id</th>
+                <th>Cpu usage [%]</th>
+                <th>Swap usage [%]</th>
+            </tr>
+            </thead>
 
+            <tbody>
+            {% for data in current_data %}
+                <tr>
+                    <td>{{ data.id }}</td>
+                    <td>{{ data.CPU_usage }}</td>
+                    <td>{{ data.SWAP_usage }}</td>
+                </tr>
+            {% endfor %}
 
-</body>
-</html>
+            </tbody>
+        </table>
+
+    {% else %}
+        <h3> No data! </h3>
+    {% endif %}
+
+{% endblock body %}
+
+</div>

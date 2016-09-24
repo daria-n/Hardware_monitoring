@@ -1,0 +1,16 @@
+body {
+    #background: white url("../images/background.jpg")
+}
+
+.navbar {
+    border-radius: 0;
+}
+
+.navbar-brand {
+    font-family: 'Satisfy', cursive;
+}
+
+.navbar-inverse {
+    background-color: #122b40;
+    border-color: #122b40;
+}
